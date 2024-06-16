@@ -1,0 +1,237 @@
+-- MySQL Workbench Forward Engineering
+
+SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0;
+SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;
+SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION';
+
+-- -----------------------------------------------------
+-- Schema mydb
+-- -----------------------------------------------------
+
+-- -----------------------------------------------------
+-- Schema mydb
+-- -----------------------------------------------------
+CREATE SCHEMA IF NOT EXISTS `mydb` DEFAULT CHARACTER SET utf8mb3 ;
+USE `mydb` ;
+
+-- -----------------------------------------------------
+-- Table `mydb`.`profesor`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `mydb`.`profesor` (
+  `idProfesor` INT NOT NULL AUTO_INCREMENT,
+  `Profesor_dni` VARCHAR(9) NOT NULL,
+  `primer_nombre` VARCHAR(50) NOT NULL,
+  `segundo_nombre` VARCHAR(50) NOT NULL,
+  `apellido_paterno` VARCHAR(50) NOT NULL,
+  `apellido_materno` VARCHAR(50) NOT NULL,
+  `telefono` VARCHAR(20) NOT NULL,
+  `correo` VARCHAR(254) NOT NULL,
+  PRIMARY KEY (`idProfesor`),
+  UNIQUE INDEX `Profesor_dni_UNIQUE` (`Profesor_dni` ASC) VISIBLE)
+ENGINE = InnoDB
+AUTO_INCREMENT = 2
+DEFAULT CHARACTER SET = utf8mb3;
+
+
+-- -----------------------------------------------------
+-- Table `mydb`.`curso`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `mydb`.`curso` (
+  `idCurso` INT NOT NULL AUTO_INCREMENT,
+  `Curso_Nombre` VARCHAR(100) NULL DEFAULT NULL,
+  `Curso_Descripcion` LONGTEXT NULL DEFAULT NULL,
+  `Profesor_id` INT NULL DEFAULT NULL,
+  PRIMARY KEY (`idCurso`),
+  INDEX `Profesor_id_idx` (`Profesor_id` ASC) VISIBLE,
+  CONSTRAINT `fk_Profesor`
+    FOREIGN KEY (`Profesor_id`)
+    REFERENCES `mydb`.`profesor` (`idProfesor`))
+ENGINE = InnoDB
+AUTO_INCREMENT = 3
+DEFAULT CHARACTER SET = utf8mb3;
+
+
+-- -----------------------------------------------------
+-- Table `mydb`.`clase`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `mydb`.`clase` (
+  `idClase` INT NOT NULL AUTO_INCREMENT,
+  `Curso_id` INT NULL DEFAULT NULL,
+  `Profesor_id` INT NULL DEFAULT NULL,
+  `Horario` VARCHAR(45) NULL DEFAULT NULL,
+  PRIMARY KEY (`idClase`),
+  UNIQUE INDEX `idClase_UNIQUE` (`idClase` ASC) VISIBLE,
+  INDEX `Curso_id_idx` (`Curso_id` ASC) VISIBLE,
+  INDEX `Profesor_id_idx` (`Profesor_id` ASC) VISIBLE,
+  CONSTRAINT `fk_Clase_Curso`
+    FOREIGN KEY (`Curso_id`)
+    REFERENCES `mydb`.`curso` (`idCurso`),
+  CONSTRAINT `fk_Clase_Profesor`
+    FOREIGN KEY (`Profesor_id`)
+    REFERENCES `mydb`.`profesor` (`idProfesor`))
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8mb3;
+
+
+-- -----------------------------------------------------
+-- Table `mydb`.`estudiante`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `mydb`.`estudiante` (
+  `idEstudiante` INT NOT NULL AUTO_INCREMENT,
+  `Estudiante_dni` VARCHAR(9) NOT NULL,
+  `primer_nombre` VARCHAR(50) NOT NULL,
+  `segundo_nombre` VARCHAR(50) NOT NULL,
+  `apellido_paterno` VARCHAR(50) NOT NULL,
+  `apellido_materno` VARCHAR(50) NOT NULL,
+  `fecha_nacimiento` VARCHAR(50) NOT NULL,
+  `direccion` VARCHAR(50) NOT NULL,
+  PRIMARY KEY (`idEstudiante`),
+  UNIQUE INDEX `Estudiante_dni_UNIQUE` (`Estudiante_dni` ASC) VISIBLE)
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8mb3;
+
+
+-- -----------------------------------------------------
+-- Table `mydb`.`calificacion`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `mydb`.`calificacion` (
+  `idCalificacion` INT NOT NULL AUTO_INCREMENT,
+  `Estudiante_id` INT NULL DEFAULT NULL,
+  `Clase_id` INT NULL DEFAULT NULL,
+  `Puntuacion` DECIMAL(3,1) NULL DEFAULT '0.0',
+  `Aprobado` TINYINT NULL DEFAULT '0',
+  PRIMARY KEY (`idCalificacion`),
+  INDEX `Estudiante_id_idx` (`Estudiante_id` ASC) VISIBLE,
+  INDEX `Clase_id_idx` (`Clase_id` ASC) VISIBLE,
+  CONSTRAINT `fk_Calificacion_Clase`
+    FOREIGN KEY (`Clase_id`)
+    REFERENCES `mydb`.`clase` (`idClase`),
+  CONSTRAINT `fk_Calificacion_Estudiante`
+    FOREIGN KEY (`Estudiante_id`)
+    REFERENCES `mydb`.`estudiante` (`idEstudiante`))
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8mb3;
+
+
+-- -----------------------------------------------------
+-- Table `mydb`.`clase_estudiante`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `mydb`.`clase_estudiante` (
+  `idClase_Estudiante` INT NOT NULL AUTO_INCREMENT,
+  `Clase_id` INT NOT NULL,
+  `Estudiante_id` INT NOT NULL,
+  PRIMARY KEY (`idClase_Estudiante`),
+  INDEX `Clase_id_idx` (`Clase_id` ASC) VISIBLE,
+  INDEX `Estudiante_id_idx` (`Estudiante_id` ASC) VISIBLE,
+  CONSTRAINT `fk_Clase_Estudiante_Clase`
+    FOREIGN KEY (`Clase_id`)
+    REFERENCES `mydb`.`clase` (`idClase`),
+  CONSTRAINT `fk_Clase_Estudiante_Estudiante`
+    FOREIGN KEY (`Estudiante_id`)
+    REFERENCES `mydb`.`estudiante` (`idEstudiante`))
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8mb3;
+
+
+-- -----------------------------------------------------
+-- Table `mydb`.`padre_de_familia`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `mydb`.`padre_de_familia` (
+  `idPadre` INT NOT NULL AUTO_INCREMENT,
+  `Padre_dni` VARCHAR(9) NOT NULL,
+  `primer_nombre` VARCHAR(50) NOT NULL,
+  `segundo_nombre` VARCHAR(50) NOT NULL,
+  `apellido_paterno` VARCHAR(50) NOT NULL,
+  `apellido_materno` VARCHAR(50) NOT NULL,
+  `telefono` VARCHAR(20) NOT NULL,
+  `correo` VARCHAR(254) NOT NULL,
+  PRIMARY KEY (`idPadre`),
+  UNIQUE INDEX `Padre_dni_UNIQUE` (`Padre_dni` ASC) VISIBLE)
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8mb3;
+
+
+-- -----------------------------------------------------
+-- Table `mydb`.`estudiante_padre`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `mydb`.`estudiante_padre` (
+  `idEstudiante_Padre` INT NOT NULL AUTO_INCREMENT,
+  `Estudiante_id` INT NOT NULL,
+  `Padre_id` INT NOT NULL,
+  PRIMARY KEY (`idEstudiante_Padre`),
+  INDEX `Padre_id_idx` (`Padre_id` ASC) VISIBLE,
+  INDEX `Estudiante_id_idx` (`Estudiante_id` ASC) VISIBLE,
+  CONSTRAINT `fk_Estudiante`
+    FOREIGN KEY (`Estudiante_id`)
+    REFERENCES `mydb`.`estudiante` (`idEstudiante`),
+  CONSTRAINT `fk_Padre`
+    FOREIGN KEY (`Padre_id`)
+    REFERENCES `mydb`.`padre_de_familia` (`idPadre`))
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8mb3;
+
+
+-- -----------------------------------------------------
+-- Table `mydb`.`horarios`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `mydb`.`horarios` (
+  `idhorarios` INT NOT NULL AUTO_INCREMENT,
+  `id_curso` INT NULL DEFAULT NULL,
+  `dia` VARCHAR(20) NULL DEFAULT NULL,
+  `hora_inicio` TIME NULL DEFAULT NULL,
+  `hora_fin` TIME NULL DEFAULT NULL,
+  PRIMARY KEY (`idhorarios`),
+  INDEX `id_curso_idx` (`id_curso` ASC) VISIBLE,
+  CONSTRAINT `fk_horarios_Curso`
+    FOREIGN KEY (`id_curso`)
+    REFERENCES `mydb`.`curso` (`idCurso`))
+ENGINE = InnoDB
+AUTO_INCREMENT = 4
+DEFAULT CHARACTER SET = utf8mb3;
+
+
+-- -----------------------------------------------------
+-- Table `mydb`.`inscripciones`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `mydb`.`inscripciones` (
+  `idInscripciones` INT NOT NULL AUTO_INCREMENT,
+  `id_estudiante` INT NULL DEFAULT NULL,
+  `id_curso` INT NULL DEFAULT NULL,
+  `fecha_inscripcion` DATE NULL DEFAULT NULL,
+  PRIMARY KEY (`idInscripciones`),
+  INDEX `id_Estudiante_idx` (`id_estudiante` ASC) VISIBLE,
+  INDEX `id_curso_idx` (`id_curso` ASC) VISIBLE,
+  CONSTRAINT `fk_Inscripciones_Curso`
+    FOREIGN KEY (`id_curso`)
+    REFERENCES `mydb`.`curso` (`idCurso`),
+  CONSTRAINT `fk_Inscripciones_Estudiante`
+    FOREIGN KEY (`id_estudiante`)
+    REFERENCES `mydb`.`estudiante` (`idEstudiante`))
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8mb3;
+
+
+-- -----------------------------------------------------
+-- Table `mydb`.`profesor_curso`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `mydb`.`profesor_curso` (
+  `idProfesor_curso` INT NOT NULL AUTO_INCREMENT,
+  `Profesor_id` INT NULL DEFAULT NULL,
+  `Curso_id` INT NULL DEFAULT NULL,
+  PRIMARY KEY (`idProfesor_curso`),
+  UNIQUE INDEX `idProfesor_curso_UNIQUE` (`idProfesor_curso` ASC) VISIBLE,
+  INDEX `Profesor_id_idx` (`Profesor_id` ASC) VISIBLE,
+  INDEX `Curso_id_idx` (`Curso_id` ASC) VISIBLE,
+  CONSTRAINT `fk_Profesor_curso_Curso`
+    FOREIGN KEY (`Curso_id`)
+    REFERENCES `mydb`.`curso` (`idCurso`),
+  CONSTRAINT `fk_Profesor_curso_Profesor`
+    FOREIGN KEY (`Profesor_id`)
+    REFERENCES `mydb`.`profesor` (`idProfesor`))
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8mb3;
+
+
+SET SQL_MODE=@OLD_SQL_MODE;
+SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
+SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
